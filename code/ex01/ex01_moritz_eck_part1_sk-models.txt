@@ -1,0 +1,31 @@
+Compare the outputs of the three classifiers: 
+- Multinomial Naive Bayes Classifier
+Accuracy:  0.7793979303857008
+
+- Linear Support Vector Classifier
+{'svc__C': 0.1, 'svc__loss': 'hinge', 'svc__multi_class': 'crammer_singer'}
+Accuracy:  0.8447789275634995
+
+- Decision Tree Classifier
+{'tree__criterion': 'gini', 'tree__max_depth': None, 'tree__min_samples_leaf': 2}
+0.587958607714017
+
+Reason for the highest scoring result:
+
+
+What is the advantage of grid search cross validation?
+The advantage of cross validation is that the result of the classifier is valid not only on 1 specific train/test split but on n-Folds. 
+This is beneficial since the 1-split might be a too optimistic or pestimistic result. 
+Cross validation ensures that every fold (e.g. in 5-fold) is used a validation set once and otherwise as training set. The results of the classifier are average across all five folds. 
+
+The benefit of using grid search is that a combination of parameters can be evaluated automatically. Otherwise the developer would have to manually change the parameters and check if the results improves or not. 
+GridSearch evaluates automatically different parameters by changing them and retraining the classifier. GridSearch will keep the best result i.e. the parameters producing the best scoring classifier. 
+
+The combination of GridSearch and CrossValidation allows to obtain a more realistic result. 
+If GridSearch was performed on a single split setting (same train/test split) then the classifier might be adjusted too much for this setting. One could say it would overfit to this specific split. 
+
+
+
+
+
+

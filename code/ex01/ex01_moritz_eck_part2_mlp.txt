@@ -1,0 +1,20 @@
+Task 2.1: Sklearn MLPClassifier
+
+using top 300 features
+{'solver': 'adam', 'hidden_layer_sizes': (100,), 'alpha': accuracy: 0.0001, 'activation': 'tanh'}
+accuracy: 0.7060206961429916
+
+{'solver': 'adam', 'hidden_layer_sizes': (100, 100), 'alpha': accuracy: 0.0001, 'activation': 'relu'}
+accuracy: 0.706961429915334
+
+using top 600 features
+{'solver': 'adam', 'hidden_layer_sizes': (100, 100), 'alpha': accuracy: 0.0001, 'activation': 'relu'}
+accuracy: 0.746472248353716
+
+using 1500 features
+{'solver': 'adam', 'hidden_layer_sizes': (100, 100), 'alpha': accuracy: 0.0001, 'activation': 'tanh'}
+accuracy: 0.8010348071495766
+
+using 2500 features
+{'solver': 'adam', 'hidden_layer_sizes': (300, 300), 'alpha': accuracy: 0.001, 'activation': 'relu'}
+accuracy: 0.8151458137347131
