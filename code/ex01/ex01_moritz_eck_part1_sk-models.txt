@@ -1,14 +1,15 @@
 Compare the outputs of the three classifiers: 
 - Multinomial Naive Bayes Classifier
+{'vect__ngram_range': (1, 3), 'vect__min_df': 1, 'vect__max_df': 0.9, 'mnb__alpha': 0.1}
 Accuracy:  0.7793979303857008
 
 - Linear Support Vector Classifier
-{'svc__C': 0.1, 'svc__loss': 'hinge', 'svc__multi_class': 'crammer_singer'}
+{'vect__ngram_range': (1, 3), 'vect__min_df': 1, 'vect__max_df': 0.9, 'svc__multi_class': 'crammer_singer', 'svc__loss': 'hinge', 'svc__C': 1.0}
 Accuracy:  0.8447789275634995
 
 - Decision Tree Classifier
-{'tree__criterion': 'gini', 'tree__max_depth': None, 'tree__min_samples_leaf': 2}
-0.587958607714017
+{'vect__ngram_range': (1, 2), 'vect__min_df': 3, 'vect__max_df': 0.99, 'tree__min_samples_leaf': 1, 'tree__max_depth': None, 'tree__criterion': 'entropy'}
+0.6820319849482597
 
 Reason for the highest scoring result:
 
@@ -23,9 +24,3 @@ GridSearch evaluates automatically different parameters by changing them and ret
 
 The combination of GridSearch and CrossValidation allows to obtain a more realistic result. 
 If GridSearch was performed on a single split setting (same train/test split) then the classifier might be adjusted too much for this setting. One could say it would overfit to this specific split. 
-
-
-
-
-
-
