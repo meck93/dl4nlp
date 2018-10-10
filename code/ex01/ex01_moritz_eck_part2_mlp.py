@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import random
 
+from read_transform import read_tweets, preprocess_tweets
+
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -16,7 +18,11 @@ from sklearn.metrics import accuracy_score
 seed = np.random.seed(seed=200)
 
 # read preprocessed data from file
-tweets = pd.read_csv("./outputs/tweets.csv", sep=";", dtype={'text': str})
+tweets = read_tweets(min_tweets=1181, seed=seed)
+
+# preprocess the data
+tweets = preprocess_tweets(data=tweets, save_to_file=False)
+tweets.drop(columns=['id'])
 print(tweets.head())
 print(tweets.describe())
 
@@ -44,19 +50,17 @@ label_encoder = LabelEncoder()
 y_train = label_encoder.fit_transform(y_train)
 y_test = label_encoder.transform(y_test)
 
-# vectorize the data
-cvec = CountVectorizer(strip_accents='unicode', lowercase=True, ngram_range=(1,3), max_df=1.0, min_df=1, max_features=2500)
+# vectorize the tweets
+cvec = CountVectorizer(strip_accents='unicode', lowercase=True, ngram_range=(1,4), max_df=0.99, min_df=1, max_features=2500)
 cvec.fit(x_train)
-
 x_train = cvec.transform(x_train)
 x_test = cvec.transform(x_test)
 
-# apply tfidf
-tfidf = TfidfTransformer(use_idf=True, smooth_idf=True)
-tfidf.fit(x_train)
-
-x_train = tfidf.transform(x_train)
-x_test = tfidf.transform(x_test)
+# apply tf-idf transformation
+transf = TfidfTransformer(use_idf=True, smooth_idf=True)
+transf.fit(x_train)
+x_train = transf.transform(x_train)
+x_test = transf.transform(x_test)
 
 # train mlp
 mlp = MLPClassifier(early_stopping=True, validation_fraction=0.2, random_state=0, batch_size='auto', verbose=True, max_iter=200, n_iter_no_change=25)

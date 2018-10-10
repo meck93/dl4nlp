@@ -1,4 +1,4 @@
-def read_tweets(min_tweets, seed, save_to_file=False):
+def read_tweets(min_tweets, seed):
     import numpy as np
     import pandas as pd
     from collections import defaultdict

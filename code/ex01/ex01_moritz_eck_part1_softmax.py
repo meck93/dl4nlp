@@ -119,10 +119,10 @@ def gd_soft_cross(X, y, w, eta, steps):
 seed = np.random.seed(seed=200)
 
 # read the data
-data = read_tweets(min_tweets=845, seed=seed, save_to_file=False)
+data = read_tweets(min_tweets=845, seed=seed)
 
 # preprocess the data
-data = preprocess_tweets(data=data)
+data = preprocess_tweets(data=data, save_to_file=True)
 data.drop(columns=['id'])
 print(data.head(5))
 
