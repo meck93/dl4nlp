@@ -19,7 +19,7 @@ Assumptions for slight difference in results:
 0.7945431024344349
 * unable to use more than 2500 features on my laptop... 
 
-### Tensorflow Models Evaluated - Colab Result
+### Tensorflow Models Evaluated - Colab Result: https://colab.research.google.com/drive/1CtCbLA0teucg-PBaq4wir4GNJdCt6Gwz
 * Each model uses a validation set to measure the validation accuracy.
 * Early stopping is used to stop once the validation error has stopped decreasing (tolerance of 25 epochs)
 * The differences between the models are boldfaced
