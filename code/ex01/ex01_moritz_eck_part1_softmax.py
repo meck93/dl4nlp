@@ -54,7 +54,7 @@ def gradient_descent_reg(X, y, W, eta, steps):
     W_learned = W.copy()
     
     for step in range(0, steps):
-        loss, dW = gradient_reg(X, y, W_learned, 2)
+        loss, dW = gradient_reg(X, y, W_learned, 0.1)
         print(loss)
         W_learned = W_learned - eta * dW
         
@@ -78,7 +78,8 @@ def cross_entropy(X,y):
     # we use multidimensional array indexing to extract softmax probability of the correct label for each sample.
     log_likelihood = -np.log(p[range(num_samples),y])
 
-    loss = np.sum(log_likelihood) / num_samples    
+    loss = np.sum(log_likelihood) / num_samples   
+
     return loss
 
 def delta_cross_entropy(X,y):
@@ -89,10 +90,12 @@ def delta_cross_entropy(X,y):
     	It can be computed as y.argmax(axis=1) from one-hot encoded vectors of labels if required.
     """
     y = y.argmax(axis=1)
-    m = y.shape[0]
+    num_samples = y.shape[0]
+
     grad = softmax(X)
-    grad[range(m),y] -= 1
-    grad = grad/m
+    grad[range(num_samples),y] -= 1
+    grad = grad/num_samples
+
     return grad
 
 def gd_soft_cross(X, y, w, eta, steps):
@@ -105,15 +108,17 @@ def gd_soft_cross(X, y, w, eta, steps):
     :param steps: number of times gradient descent should be performed
     :return: learned representation matrix w_learned
     """  
+    w_learn = w.copy()
+
     for step in range(0, steps):
         loss = cross_entropy(X, y)
         dw = delta_cross_entropy(X, y)
         
         print(loss)
 
-        w = w - eta * dw     
+        w_learn = w_learn - eta * dw     
 
-    return w  
+    return w_learn
 
 # set a seed for random, so results are reproducible
 seed = np.random.seed(seed=200)
@@ -141,8 +146,9 @@ x_test = test.drop('lang', axis=1)
 x_test = x_test['text'].values
 
 # vectorize the tweets
-cvec = CountVectorizer(strip_accents='unicode', lowercase=True, ngram_range=(1,4), max_df=0.99, min_df=1)
+cvec = CountVectorizer(strip_accents='unicode', lowercase=True, ngram_range=(1,2), max_df=0.99, min_df=1)
 cvec.fit(x_train)
+
 x_train = cvec.transform(x_train)
 x_test = cvec.transform(x_test)
 

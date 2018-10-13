@@ -12,7 +12,10 @@ Accuracy:  0.8447789275634995
 0.6820319849482597
 
 Reason for the highest scoring result:
+- The Liner Support Vector Classifier scores the best of all three models by a larger margin (+/- 7% compared to Multinomial Naive Bayes and +/- 16% compared to the Decision Tree Classifier)
 
+Assumption: 
+- I believe too many features (with the same or low importance) are used as input for the decision tree classifier such that the decision tree cannot pick the most important features. 
 
 What is the advantage of grid search cross validation?
 The advantage of cross validation is that the result of the classifier is valid not only on 1 specific train/test split but on n-Folds. 

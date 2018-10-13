@@ -1,5 +1,99 @@
 Task 2.1: Sklearn MLPClassifier
 
+Setup
+- Both models used the top 9 languages ['en', 'ja', 'es', 'und', 'id', 'pt', 'ar', 'ru', 'fr']
+- Datasets were downsampled to 1181 tweets per dataset
+
+Results 
+- Both models deliver approx. the same results. The best results for both Colab and sklearn are within 1% accuray (sklearn 79.5% and 78.6%). 
+
+Assumptions for slight difference in results: 
+- The pipleline setup with RandomizedSearchCV at the end of the Sklearn contributes to a more optimal model than in the Colab setting where all parameters have to be tuned by hand (regularization, activation functions, etc. are fixed in the colab / tensorflow model). In the sklearn setup, a subset of the chosen parameters is evaluated and the best combination is chosen.   
+- The preprocessing matters the most. I have played around with the preprocessing (adding / removing features) and the impact is larger (5-10% accuracy range) than the impact of fine tuning the models. At the bottom of this file I have copied the result for the sklearn model with different preprocessing steps. The best result is 2% better as the best model reported below. 
+- The sklearn model evalutes different activation functions (tanh and relu) wheras the tensorflow model (colab) only uses the relu activation function. 
+
+
+### Sklearn Results
+- using 2500 input features
+{'solver': 'adam', 'hidden_layer_sizes': (100,), 'alpha': 0.0001, 'activation': 'tanh'}
+0.7945431024344349
+* unable to use more than 2500 features on my laptop... 
+
+### Tensorflow Models Evaluated - Colab Result
+* Each model uses a validation set to measure the validation accuracy.
+* Early stopping is used to stop once the validation error has stopped decreasing (tolerance of 25 epochs)
+* The differences between the models are boldfaced
+* The model always used input_dim=num_features(==5000)
+
+**1. Model **
+
+* model = tf.keras.Sequential()
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=l2(0.001)))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(num_labels, activation=tf.nn.softmax))
+* model.compile(**optimizer=tf.train.AdamOptimizer()**, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+* batch size: 512
+
+Test accuracy: 0.7822201317027281
+
+
+**2. Model **
+
+* model = tf.keras.Sequential()
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=l2(0.001)))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(num_labels, activation=tf.nn.softmax))
+* model.compile(**optimizer=tf.train.MomentumOptimizer(learning_rate=0.01, momentum=0.9, use_locking=False, name='Momentum', use_nesterov=True)**,   loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+* batch size: 512
+              
+Test accuracy: 0.6472248352033735
+
+
+**3. Model **
+
+* model = tf.keras.Sequential()
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=l2(0.001)))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(512, activation=tf.nn.relu, input_dim=num_features))
+* model.add(tf.keras.layers.Dense(num_labels, activation=tf.nn.softmax))
+* model.compile(**optimizer=tf.train.AdadeltaOptimizer(learning_rate=0.01, rho=0.95, epsilon=1e-08, use_locking=False, name='Adadelta')**, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+* batch size: 512
+
+Test accuracy: 0.2427093132643462
+
+
+**4. Model **
+
+* model = tf.keras.Sequential()
+* model.add(tf.keras.layers.Dense(**256**, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=**l2(0.01)**))
+* model.add(tf.keras.layers.Dense(**256**, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=**l2(0.001)**))
+* model.add(tf.keras.layers.Dense(num_labels, activation=tf.nn.softmax))
+* model.compile(**optimizer=tf.train.AdamOptimizer()**, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+* batch size: 256
+* only 1 hidden layers
+
+Test accuracy: 0.786453433678269
+
+
+**5. Model **
+
+* model = tf.keras.Sequential()
+* model.add(tf.keras.layers.Dense(**1024**, activation=tf.nn.relu, input_dim=num_features, kernel_regularizer=**l2(0.01)**))
+* model.add(tf.keras.layers.Dense(num_labels, activation=tf.nn.softmax))
+* model.compile(**optimizer=tf.train.AdamOptimizer()**, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+* batch size: 1024
+* no hidden layer (input + output layer only)
+
+Test accuracy: 0.7732831609215471
+
+Sklearn MLPClassifier Results (with different preprocessing of the data before input to model)
 using top 300 features
 {'solver': 'adam', 'hidden_layer_sizes': (100,), 'alpha': accuracy: 0.0001, 'activation': 'tanh'}
 accuracy: 0.7060206961429916

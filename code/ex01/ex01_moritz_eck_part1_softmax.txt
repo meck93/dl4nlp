@@ -1,0 +1,9 @@
+Compare the output of the SVC and the SMC: 
+- Difference? 
+
+- What additional information do we get from the SMC?
+The advantage with the SMC over the SVC is that the SVC performs a hard classification and assign a discrete label wheras the output of the SMC is a probabilty (since it uses the softmax function). Even though the probaility is turned into a hard classification to assign a label to the instance during the computation the probability output of the SMC is used. 
+
+Output Results for SVC
+
+Output Result for SMC
