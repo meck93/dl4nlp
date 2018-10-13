@@ -12,8 +12,11 @@ Output Result for SMC
 - accuracy: 0.427810650887574
 
 - Difference in performance is around 1%. I assume this is due to the difference (SMC - probability output and SVC - hard label assignment) but more below...
+- A huge difference is the learning speed. On my laptop (surface book 2), I was only able to perfrom approximately 10 iterations of full gradient descent with 500 features using SVC. Compared to the 250 iterations of SMC in the same time period.
+- Assumption 1: I have read that this can be due to the vanishing gradients problem that the mean square error loss derivate has... (Source: http://rohanvarma.me/Loss-Functions/)
+- Assumption 2: Multi-class hinge loss performs poorly / slow learning in the early stages of training due to random initialization of the weights.
 
 What additional information do we get from the SMC?
-- The multi class hinge loss is a hard class assignment (no class membership probabilities only discrete labels). 
+- The multi class hinge loss is a hard class assignment (no class membership probabilities only discrete labels). It tires to maximize the margin between the decision boundry and the data points. 
 - The cross entropy loss measure the dissimilarity between the true label distribution and the predicted label distribution. Returns a vector with probabilities.
 - The advantage with the SMC over the SVC is that the SMC assign a class membership probability (a vector of weights) as label to an instance (since it uses the softmax function). Even though the probaility is turned into a hard classification to assign a label to the instance during the computation the probability output of the SMC is used. On the other hand, the SVC performs a hard classification and assign a discrete label. 

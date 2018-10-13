@@ -54,7 +54,6 @@ def gradient_descent(X, y, w, eta, steps):
 
     for step in range(0, steps):
         loss, dW = multi_class_hing_loss(w_learn, X, y, 0.5)
-        print("current loss:", loss)
         w_learn = w_learn - eta * dW     
 
     return w_learn
@@ -119,7 +118,6 @@ class Softmax(object):
     for iter in range(num_iters):
       # Get loss and gradients
       loss, dW, db = self.get_loss_grads(X, y, reg, n_features, n_samples, n_classes)
-      print("loss:", loss)
       
       # update weights and biases
       self.W -= learning_rate*dW
@@ -187,23 +185,24 @@ print(lb.classes_, n_classes)
 
 # append the bias term to x_train
 bias_vector = np.ones([x_train.shape[0], 1])
-x_train = np.append(x_train, bias_vector, axis=1)
+x_train_svc = np.append(x_train, bias_vector, axis=1)
 
 # initialise weight matrix with small weights
-w = np.random.randn(x_train.shape[1], len(lb.classes_)) * 0.0001
+w = np.random.randn(x_train_svc.shape[1], len(lb.classes_)) * 0.0001
 
 # compute the optimal weights
-w_star_reg = gradient_descent(x_train, y_train_bin, w, eta=0.01, steps=15)
+print("Training SVC")
+w_star_reg = gradient_descent(x_train_svc, y_train_bin, w, eta=0.01, steps=10)
 
 # append the bias term to x_test
 bias_vector_test = np.ones([x_test.shape[0], 1])
-x_test = np.append(x_test, bias_vector_test, axis=1)
+x_test_svc = np.append(x_test, bias_vector_test, axis=1)
 
 # Compute the number of correctly classified 
 true_count = 0
 false_count = 0
 
-for index, x in enumerate(x_test.dot(w_star_reg)):
+for index, x in enumerate(x_test_svc.dot(w_star_reg)):
     pred = x.argmax()
     true_label = y_test_bin[index].argmax()
 
@@ -215,13 +214,13 @@ for index, x in enumerate(x_test.dot(w_star_reg)):
 print("Correct Predictions:", true_count)
 print("Wrong Predictions:", false_count)
 print("Accuracy:", true_count / (true_count + false_count))
+print()
 
 # softmax implementation 
 softmax = Softmax()
-print(y_train_encoded.shape)
-print(x_train.shape)
 
 # train the model using softmax + corss entropy loss
+print("Training SMC")
 softmax.train(x_train, y_train_encoded, learning_rate=0.001, reg=0.5, num_iters=200)
 
 # predict the labels 
