@@ -16,6 +16,8 @@ Reason for the highest scoring result:
 
 Assumption: 
 - I believe too many features (with the same or low importance) are used as input for the decision tree classifier such that the decision tree cannot pick the most important features. 
+- I assume that since the Linear SVC model trains a one-versus-rest model it might be better at descriminating wheter a tweet belongs to a a category or not.
+- One problem with the MN-NB Classifier might be that it assumes conditional independence accross the features but since it's text there exists an inherent order between the words => might be another reason. On the other hand, it is a widely used classifier when working with text data so I'm assuming that the reason might be due to the way I preprocessed the data...
 
 What is the advantage of grid search cross validation?
 The advantage of cross validation is that the result of the classifier is valid not only on 1 specific train/test split but on n-Folds. 
