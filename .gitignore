@@ -106,6 +106,10 @@ venv.bak/
 # vscode    
 .vscode/
 
-# ignore zip files
+# ignore zip files (ex01)
 *.zip
 code/ex*/outputs/
+
+# ignore ex02 glove and inputs
+code/ex02/glove/
+code/ex02/input/
