@@ -113,3 +113,6 @@ code/ex*/outputs/
 # ignore ex02 glove and inputs
 code/ex02/glove/
 code/ex02/input/
+
+# ignore folder from ex03
+code/ex03/results/
