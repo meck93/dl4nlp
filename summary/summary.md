@@ -43,12 +43,22 @@
   - [Recurrent Neural Networks (RNNs) (Chapters 14,15,16)](#recurrent-neural-networks-rnns-chapters-141516)
     - [The RNN Abstraction](#the-rnn-abstraction)
     - [RNN Training](#rnn-training)
+      - [Dropout in RNN](#dropout-in-rnn)
     - [Bi-Directional RNN](#bi-directional-rnn)
     - [Multi-Layer (Stacked) RNNs / _deep RNNs_](#multi-layer-stacked-rnns--_deep-rnns_)
     - [RNN Applications / Usages](#rnn-applications--usages)
+    - [Exploding and Vanishing Gradients with Simple RNNs](#exploding-and-vanishing-gradients-with-simple-rnns)
+      - [RNN Architectures](#rnn-architectures)
+      - [Simple RNN (S-RNN)](#simple-rnn-s-rnn)
     - [Gated Architectures](#gated-architectures)
-      - [LSTM](#lstm)
-      - [GRU](#gru)
+      - [LSTM (Long Short-Term Memory)](#lstm-long-short-term-memory)
+      - [GRU (Gated Recurrent Unit)](#gru-gated-recurrent-unit)
+      - [Other RNN Usage](#other-rnn-usage)
+    - [RNN Generators](#rnn-generators)
+    - [Conditioned Generation](#conditioned-generation)
+    - [Sequence to Sequence Models: Encoder-Decoder Framework](#sequence-to-sequence-models-encoder-decoder-framework)
+    - [Next Step? (Soft-) Attention](#next-step-soft--attention)
+      - [Attention](#attention)
 
 <div style="page-break-after: always;"></div>
 
@@ -222,9 +232,9 @@ Error estimate based on a single training data point is inaccurate => noise! To 
 
 > **Larger m** provides more accurate estimate, **Smaller m** allows for faster updates => faster convergence
 
-**Momentum**:
+**Momentum**: takes into account the acculmulated previous gradients: $\mathbf{m = \beta m + \nabla, w = w - m}$. This can help to escape plateaus (i.e. saddle points) much faster. Nesterov momentum measures the gradient slightly ahead in the direction of the momentum. 
 
-**Adaptive Learning Rate**:
+**Learning Rate Decay or Adaptive Learning Rate**: Requires less manual tuning of the learning rate since it is automatically adjusted.     
 
 **Early-Stopping:** Stop training once the validation error has stopped decreasing for a fixed number of iterations
 
@@ -269,6 +279,8 @@ $$
 
 **ReLu (Rectified Linear Units):** $\text{ReLu}(x) = \max (0,x)$ => not expensive to compute, gradients don't saturate!
 
+<div style="page-break-after: always;"></div>
+
 #### Different Types of NN-Models
 
 **FF-NN**: fixed or variable sized input, disregard the order of elements, learns the combination of input components, can be used whenever a linear model could be used, non-linearity often leads to superior classification results
@@ -292,6 +304,8 @@ $$
 **Forward Pass:** Evaluating the predictions for given inputs and weights
 
 **Backward Pass:** Computing the gradients for the given parameters w.r.t. a scalar loss. Requires a forward pass up to a designated node i.e. the loss-node ~ mostly the output node. Then, the backward computation computes the gradients starting from the loss-node backwards => applies the chain-rule of differentiation.
+
+<div style="page-break-after: always;"></div>
 
 ##### Backpropagation
 
@@ -375,13 +389,13 @@ Using a **window over the target word** allows to take the local context into ac
 
 **Embedding Layer**: mapping of discrete symbols (e.g., chars, words) to continuous vectors in low dim space. Mapping or lookup function. Mapping is done with a hash function.
 
+<div style="page-break-after: always;"></div>
+
 #### Combining Dense Vectors
 
 **Window-Based Features**: If relative position is relevant, **concatenated** the context to the target word \[word-2, word-1, target_word, word+1, word+2] otherwise use **sum/weighted-sum** (to discount for words further away).
 
 **Variable Number of Features (Continuous Bag-Of-Words):** A way to represent an unbounded number of words (e.g., the number of words in a sentence) as a fixed size input vector. It works by either summing or averaging the embedding vectors of the corresponding features. Can also incorporate TF-IDF weights.
-
-<div style="page-break-after: always;"></div>
 
 ## Embeddings (Chapters 10,11)
 
@@ -411,6 +425,8 @@ Additional Info: [When to use pre-trained embeddings?](https://www.kaggle.com/sb
 
 **"Unsupervised" pre-training:** commonly there isn't an auxiliary task with large enough amounts of labeled data => use _"unsupervised"_ auxiliary task. Not a real unsupervised task!
 
+<div style="page-break-after: always;"></div>
+
 ##### Distributional Hypothesis
 
 Word representations using the **distributional hypothesis**; "_words are similiar if they appear in similar contexts._"
@@ -430,6 +446,8 @@ $$
 > But only if no dim-reduction has been applied.
 
 ![distributional-count](figs/window_coocurrence_matrix.PNG)
+
+<div style="page-break-after: always;"></div>
 
 ##### Distributed Representations
 
@@ -521,7 +539,7 @@ $$
 
 ![Convolutions](figs/wide_narrow_convolutions.png)
 
-> window size k = 2, # filters f = 3
+> window size k = 2, # filters f = 3, word embedding dim = 4
 
 **Narrow Convolution** (No padding): $n-k+1$ positions to start => $n-k+1$ vectors
 
@@ -557,6 +575,8 @@ CNNs can be computationally expensive (matrix multiplications)! Instead **use k-
 
 **Alternative:** Don't pre-compute vocabulary-2-index mappings. Instead hash every k-gram into embedding matrix at training time.
 
+<div style="page-break-after: always;"></div>
+
 #### Hierarchical Convolutions
 
 The output of one convolution layer can be fed into another convolution layer => increases the effective windows.
@@ -581,15 +601,18 @@ Training problems due to **vanishing gradients**.
 
 ## Recurrent Neural Networks (RNNs) (Chapters 14,15,16)
 
-When dealing with language data => sequences of letters (words), words (sentences) or sentences (documents)
-=> **long-range dependencies** => RNNs allow modelling arbitrarily sized sequential inputs in a fixed-size vectors while keeping structur properties (e.g., order, etc.) of inputs.
+When dealing with language data (e.g., sequences of letters (words), words (sentences) or sentences (documents)) different sized in-/outputs exists + **long-range dependencies** (that cannot be caputered well by CNNs).
 
-**Markov Assumption**
+RNNs allow modelling **arbitrarily sized sequential inputs in fixed-size vectors** while keeping structur properties (e.g., order, etc.) of inputs.
+
+> Note: RNNs are turning complete and can theoretically simulate any program!
+
+**No Markov Assumption**
 RNNs allow for models **without Markov assumption** (_"A **k-th** order markov assumption assumes that the next word in a sequence depends only on the last **k** words."_) => next word can be **conditioned on the entire history**.
 
 #### The RNN Abstraction
 
-The RNN is defined recursively, taking as input a state vector $\mathbf{s_{i-1}}$ and an input vector $\mathbf{x_i}$, returning a new state vector $\mathbf{s_i}$ + outputing $\mathbf{y_i}$.
+The RNN is defined recursively, taking as input a state vector $\mathbf{s_{i-1}}$ ("memory") and an input vector $\mathbf{x_i}$, returning a new state vector $\mathbf{s_i}$ + outputing $\mathbf{y_i}$. Each recurrent neuron has two sets of weights: $\mathbf{w_{x_{i}}, w_{s_{i-1}}}$
 
 $$
 \text{RNN}(\mathbf{x_{1:n}, s_0}) = \mathbf{y_{1:n}}, \quad
@@ -602,15 +625,41 @@ $$
 
 > Left: Recursive Representation, Right: Unrolled over 5 states (parameters shared across all time steps)
 
+<div style="page-break-after: always;"></div>
+
 #### RNN Training
 
-Unrolled RNN can be seen as very deep NN with shared parameters => to train: unroll the RNN, add loss node + use backpropagation through time (BPTT).
+An unrolled RNN can be seen as very deep NN with shared parameters .
 
-**RNN is never used on its own** => trainable component of a larger NN. This way RNN **encodes properties** which are **useful for downstream prediction task**.
+$$
+\text{Output of a single recurrent neuron of a single instance:} \newline
+\mathbf{y}_{(t)} = \phi ( \, \mathbf{x}_{(t)}^{T} \cdot \mathbf{w}_{(x)} + \mathbf{y}_{(t-1)} \cdot \mathbf{w}_{(y)} + b \, ) \newline
+$$
+
+**Training:** Unroll the RNN, add loss node + use backpropagation through time (BPTT). Cost function evaluates the output of all time steps. **BPTT:** Gradients flow backward through all the outputs used by the cost function. A truncated version of BPTT exists where only k-steps are unrolled, loss computed, backpropagated => next k-steps.
+
+**Parameters:** RNNs share the parameters $\mathbf{W}$ across all time steps.
+
+![bptt](figs/bptt.PNG)
+
+> Cost function considers: $\mathbf{Y}_{2}, \mathbf{Y}_{3}, \mathbf{Y}_{4}$, therefore, gradients flow back through these but not $\mathbf{Y}_{0}, \mathbf{Y}_{1}$.
+
+##### Dropout in RNN
+
+First option was to only apply dropout on non-recurrent connections i.e., between RNN layers and not between sequence positions (_Naive dropout_). **Better solution:** apply dropout on all components of RNN but **keep the same dropout mask** across time steps (_Variational Dropout_).
+
+![dropout_rnn](figs/dropout_rnn.PNG)
+
+> square = RNN unit, horizontal arrows $\to$ = time dependence, vertical arrows $\uparrow$ = input/output,
+> colored connections = dropped-out inputs (different colors = different dropout masks)
+
+<div style="page-break-after: always;"></div>
 
 #### Bi-Directional RNN
 
-Relaxes the fixed window size assumption => look arbitrarily into the future (consider $\mathbf{w_{i+1:n}}$, not just $\mathbf{w_{1:i}}$). Can also be considered a general purpose feature extractor with arbitrarily sized window.
+Based on the idea that the output: $\mathbf{y}_{t}$ might not only depend on the past $\mathbf{x_{1:t}}$ but also on the future $\mathbf{x_{t:n}}$ (e.g., to predict a missing word in a sequence, you want to look at the words to the right and the left of the missing word.)
+
+Relaxes the fixed window size assumption => general purpose feature extractor with arbitrarily sized window.
 
 Maintains **two states** (by separate RNNs) per input position: $s_{i}^{\text{forward}}, s_{i}^{\text{backward}}$ => **normal + reversed** sequence
 
@@ -626,18 +675,151 @@ RNNs can be stacked in layers to form a grid: $\text{RNN}_{1},...,\text{RNN}_{k}
 
 ![stackedrnns](figs/stackedrnns.png)
 
+<div style="page-break-after: always;"></div>
+
 #### RNN Applications / Usages
 
-**Acceptor (N:1):** input sequence => use final state to predict outcome (e.g., sentiment classification, part-of-speech)
+**RNN as a component:** A RNN is never used on its own but always as a trainable component of a larger NN => this way an RNN **encodes properties** which are **useful for downstream prediction task**.
+
+**Acceptor (N:1):** input sequence => use final state to predict outcome, binary or multi-class answer (e.g., sentiment classification, part-of-speech)
 
 **Encoder (N:1):** Input sequence => use final state as encoding of info + other signals to predict (e.g., summary)
 
-**Transducer (N:N):** One output for every input (every step) => sum/average result (e.g., language modeling - predicting the distribution over _(i+1)th_ word using words $\mathbf{w_{1:n}}$ as input.
+**Transducer (N:N):** One output for every input (every step) => sum/average result (e.g., language modeling - predicting the distribution over _(i+1)th_ word using words $\mathbf{w_{1:n}}$ as input; any type of time-series data).
+
+**One to Many (1:N):** Single input => output a sequence (e.g., captioning an image)
+
+Char-level feature extractor using a bi-RNN (no OOV problem) => Alternative: Char-level CNN. Always as feature input to MLP with softmax() for classification, etc.
+
+![types](figs/rnn_types.PNG)
+
+#### Exploding and Vanishing Gradients with Simple RNNs
+
+Simple / Vanilla RNNs trained with BPTT have difficulties capturing long-term dependencies because of the _vanishing_ (i.e. gradient norm ~ 0) or _exploding_ (i.e. gradient norm $\to \infin$) gradients problem.
+
+**Solution** for **exploding** gradients (e.g., too large learning steps => oscilation): **clip gradients** at max. threshold (e.g., divide by the norm)
+
+**Solution** for **vanishing** gradients (e.g., no change at all => gradient almost 0): learn to **forget** and **remember** with more advanced architectures!
 
 <div style="page-break-after: always;"></div>
 
+### RNN Architectures
+
+##### Simple RNN (S-RNN)
+
+$\mathbf{s_{i}} = R(\mathbf{s_{i-1}, x_i}) = g(\mathbf{s_{i-1}W^{s} + x_{i}W^{x} + b})$
+
+The state $\mathbf{s_{i-1}}$ and the input $\mathbf{x_i}$ are **linearly transformed** + passed trough **non-linear activation** function.
+
+> **Note:** This makes the S-RNN **sensitive to the order** of the inputs because simple addition without non-linearity is commutative (e.g., 3+4 = 4+3 but with non-linearty transformation this no longer holds).
+
+**Problems**
+
+1. S-RNN is hard to train because S-RNN can be considered as a very deep FF-NN with shared parameters across different layers. The gradients include repeated multiplication of matrix $\mathbf{W}$ => **vanishing gradients problem**
+
+2. Memory is read + over-written at every step i.e., S-RNN blidly passes memory from one state to the next.
+
 #### Gated Architectures
 
-##### LSTM
+The state $\mathbf{s_i}$ is now considered finite memory. The operation $\mathbf{R}$ acts on the state $\mathbf{s_i}$ and the input $\mathbf{x_{i+1}}$ (i.e., reads memory + writes new memory $\mathbf{s_{i+1}}$).
 
-##### GRU
+**Memory access** is controlled trough **binary vector** $\mathbf{g} \in \{0,1\}^{n}$ + **hadamard product** $\mathbf{g \odot x}$ (_"Selects all entries in $\mathbf{x}$ that correspond to the value 1 in $\mathbf{g}$"_ i.e. the element-wise multiplication of two vectors).
+
+**Gating Mechanism**: $\mathbf{s_{i+1}} = \mathbf{g \odot x_{i+1}} + \mathbf{(1-g) \odot s_{i}}$. The operation selects all entries in $\mathbf{x_{i+1}}$ that correspond to the value 1 in $\mathbf{g}$ and all other entries from the memory $\mathbf{s_{i}}$.
+
+**Differentiable Gating Mechanism**: Since the gate behaviour shall be learned by the network (i.e., the function must be differentiable) => instead of using a binary vector, allow any real valued number in vector $\mathbf{g' \in \R^{n}}$ and pass it through the sigmoid function: $\mathbf{\sigma (g') \odot x}$ (values remain in the range $[0,1]$).
+
+<div style="page-break-after: always;"></div>
+
+##### LSTM (Long Short-Term Memory)
+
+Splits $\mathbf{s_{i} = [c_j, h_j]}$ into two parts: **memory cell** $\mathbf{c_j}$ (designed to preserve the memory + error gradients, controlled by differentiable gating mechansims) + **working memory** $\mathbf{h_j}$.
+
+At each input, a gate decides 1. what to throw away from the cell state/memory (_"forget gate"_), 2. what to store in the cell state (_"input gate"_ - which values to update) and (**z** = $\mathbf{\tilde{c_j}}$\*\* - the proposed update of all values) and 3. what to output of the memory ("_output gate_").
+
+![lstm](figs/lstm.PNG)
+
+![lstm-pic](figs/lstm-pic.PNG)
+
+**LSTM with peepholes:** Allowing the gate layers to look at the cell state. Many different ways of peepholes exist.
+
+![lstm-peep](figs/lstm-peepholes.PNG)
+
+<div style="page-break-after: always;"></div>
+
+##### GRU (Gated Recurrent Unit)
+
+LSTM are effective but can be quite complex to analyze and computationally expensive to work with.
+
+GRU is a **simpler** (only two instead of three gates) but comparable alternative. One gate (**r**) controls access to the previous state and computes the proposed updated $\mathbf{\tilde{s}_j}$. The new state $\mathbf{s_j}$ is determined based on the interpolation controlled by gate (**z**) between the previous state $\mathbf{s_{j-1}}$ and the proposal $\mathbf{\tilde{s}_j}$.
+
+![gru](figs/gru.PNG)
+
+![gru-pic](figs/gru-pic.PNG)
+
+<div style="page-break-after: always;"></div>
+
+### Other RNN Usage
+
+#### RNN Generators
+
+No markovian assumption => **conditioning on entire history** => RNN can be used as **_generators_** or **_conditioned generators_** (generated output is conditioned on a complex input).
+
+Generation works by tying the output of the RNN at time $t_i$ to its input at time $t_{i+1}$. After predicting the distribution over the next output $P(t_{i} = k | t_{1:i-1})$ a token $t_{i}$ is chosen. The token $t_{i}$ can be the **highest probability** item at each step or use **beam-search** to find the globally highest output probability.
+
+> Note: Also, possible to train on char-level with impressive results [Karapathy et al](http://karpathy.github.io/2015/05/21/rnn-effectiveness/).
+
+**Greedy-Beam Search** (global optimization strategy): choose top-k probabilities + look further on
+=> Reason: Local max. probability $\not =$ global max. probability
+
+**Teacher Forcing:** Feeding the generator the correct word even if its own prediction put a small probability mass on it and at test time, it would not have been selected.
+
+> Note: Careful during training to **not over do it** => "Exposure Bias: The model has never seen its own errors during training". During inferrence the generator will be required to assign probabilities given states not observed in training.
+
+![generators](figs/rnn-generators.png)
+
+<div style="page-break-after: always;"></div>
+
+#### Conditioned Generation
+
+The next token is generated based on the previously generated tokens $t_{1:i}$ + a conditioning context c:
+
+$\tilde{t}_{i+1} \sim P(t_{i+1} = k | t_{1:i}, c)$. The context can be conditioned on any arbitrary topic.
+
+![cond-rnn](figs/rnn-conditioned-generators.PNG)
+
+<div style="page-break-after: always;"></div>
+
+#### Sequence to Sequence Models: Encoder-Decoder Framework
+
+Context can also be a sequence (e.g., a piece of text).
+
+The **Encoder** summarizes the context sequence into a vector c (e.g., source sequence $w_{1:n}$ in French) which is used by the **Decoder** (a conditioned RNN Generator): generating the desired output sequence $w_{1:m}$. The encoder and decoder are trained jointly, supervision only for the decoder but gradients are propagated back to the encoder.
+
+**Applications/Use Cases:** Machine Translation, E-Mail Auto-Response, Morphological Inflection
+
+![seq2seq](figs/rnn-seq2seq.PNG)
+
+#### Next Step? (Soft-) Attention
+
+In the encoder-decoder framework above the context (i.e., the input sequence) is encoded into a single vector. Forces all information required for generation into a single vector + generator (i.e. the decoder) needs to be able to extract everything from a single vector.
+
+##### Attention
+
+The **input sequence** (i.e. the context) is encoded into a **sequence of vectors** + decoder uses **soft-attention mechanism to decide on what to focus on.**
+
+Encoder is a bi-RNN, encoding length n input into $\mathbf{c_{1:n}}$. Decoder can use $\mathbf{c_{1:n}}$ as read-only memory, decide at every step $j$ on which of the vectors to attend to, resulting in a focusd context vector: $\mathbf{c^{j}} = \mathrm{attend}(\mathbf{c_{1:n}}, \hat{t}_{1:j})$.
+
+**Soft-Attention:** Trainable, parameterized function => weighted average of $\mathbf{c_{1:n}}$: $\mathbf{c^{j}} = \sum_{i=1}^{n} \mathbf{\alpha_{[i]}^{j} \cdot c_{i}}$ => $\mathbf{\alpha_{[i]}^{j}}$ are all positive and sum to 1 + generated in a two stage process:
+
+- Unnormalized attention weights are **produced** with a **FF-NN** taking into account the decode state. $\mathbf{\bar{\alpha}^{j} = \bar{\alpha}_{[1]}^{j},..., \bar{\alpha}_{[n]}^{j}} = \mathrm{MLP^{att}}([\mathbf{s_j; c_1}]),..., \mathrm{MLP^{att}}([\mathbf{s_j; c_n}]) $
+
+- Unnormalized attention weights are **turned** into a **probability distribution** using the **softmax** function: $\mathbf{\alpha^{j} = \mathrm{softmax}(\mathbf{\bar{\alpha}_{[1]}^{j},..., \bar{\alpha}_{[n]}^{j}}})$.
+
+**Computational Complexity:** Encoding step remains the same $\Omicron(n)$ linear of the input. Decoding step grows from contant time to linear time operation due to computing: $\mathbf{c^{j}} = \mathrm{attend}(\mathbf{c_{1:n}}, \hat{t}_{1:j})$ at every step.
+
+> From $\Omicron(n + m)$ to $\Omicron(n \times m)$.
+
+**Interpretability:** Most NN are opaque (not clear undestanding what is encoded, what is used by decoder + why). Attention weights $\mathbf{\alpha^{j}}$ allow to see which area of the encoded input the decoder found relevant.
+
+![attention](figs/rnn-attention.png)

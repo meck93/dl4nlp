@@ -4,15 +4,25 @@ Master course at the University of Zurich (HS18)
 
 ## Content
 
-This repository contains all exercises (including description and code) and the summary of the lecture (including a book summary of Goldberg: _Neural Network Methods for Natural Language Processing_).
+This repository contains all exercises (including description and code in the folder **code**) and the summary of the lecture (including a book summary of Goldberg: _Neural Network Methods for Natural Language Processing_).
 
 The summary folder contains :
 
 - [summary.md](summary/summary.md) (main file with all content written in Markdown)
 
-- summary.html (html file created from Markdown)
+- [summary.html](summary/summary.html) (html file created from Markdown)
 
-- [summary.pdf](summary/summary.pdf) (pdf file created from html file) => **best presentation** apart from Markdown itself.
+- [summary.pdf](summary/summary.pdf) (best format/presentation style)
+
+The papers folder contains: 
+
+- [papers.md](papers/papers.md) (main file with a summary of all papers presented during the lecture written in Markdown)
+
+- [papers.html](papers/papers.html) (html file created from Markdown)
+
+- [papers.pdf](papers/papers.pdf) (best format/presentation style)
+
+
 
 ---
 
@@ -67,6 +77,13 @@ The summary folder contains :
   - Bi-Directional RNN
   - Multi-Layer (Stacked) RNNs / _deep RNNs_
   - RNN Applications / Usages
+  - RNN Architectures
+    - LSTM (Long Short-Term Memory)
+    - GRU (Gated Recurrent Unit)
+  - Other RNN Usages
+    - Generators
+    - Conditioned Generation
+    - Next Step? Attention
 
 ---
 

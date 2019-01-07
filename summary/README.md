@@ -63,6 +63,13 @@ The repository contains:
   - Bi-Directional RNN
   - Multi-Layer (Stacked) RNNs / _deep RNNs_
   - RNN Applications / Usages
+  - RNN Architectures
+    - LSTM (Long Short-Term Memory)
+    - GRU (Gated Recurrent Unit)
+  - Other RNN Usages
+    - Generators
+    - Conditioned Generation
+    - Next Step? Attention
 
 ---
 
